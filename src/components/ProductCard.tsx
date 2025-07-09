@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Producto } from '@/contexts/DataContext';
 
@@ -17,19 +16,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
   };
 
   return (
-    <div className="bg-milan-productBg rounded-2xl p-6 hover:transform hover:scale-105 transition-all duration-300 hover:shadow-2xl h-full flex flex-col">
-      <div className="relative mb-4">
+    <div className="bg-milan-productBg rounded-2xl hover:transform hover:scale-105 transition-all duration-300 hover:shadow-2xl h-full flex flex-col overflow-hidden">
+      <div className="relative">
         <img
           src={producto.imagen}
           alt={producto.nombre}
-          className="w-full h-64 object-contain rounded-xl bg-white"
+          className="w-full h-64 object-contain bg-white"
           onError={(e) => {
             e.currentTarget.src = 'https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
           }}
         />
       </div>
       
-      <div className="flex-1 flex flex-col">
+      <div className="p-6 flex-1 flex flex-col">
         <div className="mb-4">
           <h3 className="text-xl font-bold text-milan-beige mb-2">{producto.nombre}</h3>
           <p className="text-2xl font-bold text-milan-whatsapp mb-3">${producto.precio.toLocaleString()}</p>
@@ -52,13 +51,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
           {producto.sabores && producto.sabores.length > 0 && (
             <div className="mb-6">
               <p className="text-milan-beige mb-3 font-semibold">Sabores disponibles:</p>
-              <div className="flex flex-wrap gap-2 mb-4 min-h-[60px]">
+              <div className="flex flex-wrap gap-2 mb-4 h-16">
                 {producto.sabores.map((sabor, index) => (
                   <button
                     key={index}
                     onClick={() => producto.stock > 0 && sabor.disponible ? setSelectedSabor(sabor.nombre) : null}
                     disabled={producto.stock === 0 || !sabor.disponible}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 h-8 ${
                       producto.stock > 0 && sabor.disponible
                         ? selectedSabor === sabor.nombre
                           ? 'bg-milan-whatsapp text-milan-darkGray'
