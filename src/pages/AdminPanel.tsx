@@ -268,9 +268,14 @@ const AdminPanel = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Panel de Administración</h1>
-          <Button onClick={handleLogout} variant="outline">
-            Cerrar Sesión
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => window.location.href = '/'} variant="outline">
+              Ver la Web
+            </Button>
+            <Button onClick={handleLogout} variant="outline">
+              Cerrar Sesión
+            </Button>
+          </div>
         </div>
 
         <div className="flex space-x-4 mb-8">

@@ -49,19 +49,36 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loadData = async () => {
     try {
-      const [productosRes, beneficiosRes, faqsRes] = await Promise.all([
-        fetch('/data/productos.json'),
-        fetch('/data/beneficios.json'),
-        fetch('/data/faqs.json')
-      ]);
+      // First try to load from localStorage
+      const savedProductos = localStorage.getItem('productos');
+      const savedBeneficios = localStorage.getItem('beneficios');
+      const savedFaqs = localStorage.getItem('faqs');
 
-      const productosData = await productosRes.json();
-      const beneficiosData = await beneficiosRes.json();
-      const faqsData = await faqsRes.json();
+      if (savedProductos && savedBeneficios && savedFaqs) {
+        setProductos(JSON.parse(savedProductos));
+        setBeneficios(JSON.parse(savedBeneficios));
+        setFaqs(JSON.parse(savedFaqs));
+      } else {
+        // Fallback to JSON files if no localStorage data
+        const [productosRes, beneficiosRes, faqsRes] = await Promise.all([
+          fetch('/data/productos.json'),
+          fetch('/data/beneficios.json'),
+          fetch('/data/faqs.json')
+        ]);
 
-      setProductos(productosData);
-      setBeneficios(beneficiosData);
-      setFaqs(faqsData);
+        const productosData = await productosRes.json();
+        const beneficiosData = await beneficiosRes.json();
+        const faqsData = await faqsRes.json();
+
+        setProductos(productosData);
+        setBeneficios(beneficiosData);
+        setFaqs(faqsData);
+        
+        // Save initial data to localStorage
+        localStorage.setItem('productos', JSON.stringify(productosData));
+        localStorage.setItem('beneficios', JSON.stringify(beneficiosData));
+        localStorage.setItem('faqs', JSON.stringify(faqsData));
+      }
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -75,14 +92,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateProductos = (newProductos: Producto[]) => {
     setProductos(newProductos);
+    // Persist to localStorage for demo purposes (in production you'd use an API)
+    localStorage.setItem('productos', JSON.stringify(newProductos));
   };
 
   const updateBeneficios = (newBeneficios: Beneficio[]) => {
     setBeneficios(newBeneficios);
+    localStorage.setItem('beneficios', JSON.stringify(newBeneficios));
   };
 
   const updateFAQs = (newFaqs: FAQ[]) => {
     setFaqs(newFaqs);
+    localStorage.setItem('faqs', JSON.stringify(newFaqs));
   };
 
   return (

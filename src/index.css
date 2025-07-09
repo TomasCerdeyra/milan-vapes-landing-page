@@ -108,20 +108,20 @@ All colors MUST be HSL.
 /* Background pattern with larger size */
 .mushroom-pattern {
   background-image: url('/lovable-uploads/e87dd238-d0e5-48ed-9e19-c55c6cfbc9ed.png');
-  background-size: 300px 300px; /* Aumentado para que se vea menos repetitivo */
+  background-size: 400px 400px; /* Aumentado para que se vea menos repetitivo */
   background-repeat: repeat;
   background-position: center;
 }
 
 /* Hero with shadow overlay */
 .hero-gradient {
-  background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%);
+  background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
 }
 
 /* Global background pattern */
 body {
   background-image: url('/lovable-uploads/e87dd238-d0e5-48ed-9e19-c55c6cfbc9ed.png');
-  background-size: 300px 300px; /* Tamaño más grande */
+  background-size: 400px 400px; /* Tamaño más grande */
   background-repeat: repeat;
   background-attachment: fixed;
 }

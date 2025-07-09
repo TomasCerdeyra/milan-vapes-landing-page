@@ -7,7 +7,7 @@ const ProductCatalog = () => {
   const { productos } = useData();
 
   return (
-    <section id="productos" className="min-h-screen py-20 px-4 bg-gradient-to-b from-black/90 to-black/70">
+    <section id="productos" className="min-h-screen py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-on-scroll">
           <h2 className="text-5xl md:text-6xl font-tan-nimbus text-milan-cream mb-6">

@@ -22,7 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
         <img
           src={producto.imagen}
           alt={producto.nombre}
-          className="w-full h-64 object-cover rounded-xl"
+          className="w-full h-64 object-contain rounded-xl bg-white"
           onError={(e) => {
             e.currentTarget.src = 'https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
           }}
