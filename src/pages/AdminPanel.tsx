@@ -1,746 +1,733 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Lock, Plus, Edit, Trash2, Save, X, Eye, LogOut } from 'lucide-react';
-import { useData, Producto, Beneficio, FAQ } from '@/contexts/DataContext';
-import { toast } from '@/hooks/use-toast';
+import { useData } from '@/contexts/DataContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Trash2, Edit, Plus, Save, X } from 'lucide-react';
 
 const AdminPanel = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'productos' | 'beneficios' | 'faqs'>('productos');
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [showForm, setShowForm] = useState(false);
-  
   const { productos, beneficios, faqs, updateProductos, updateBeneficios, updateFAQs } = useData();
-  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('adminAuth') === 'true';
+  });
+  const [loginData, setLoginData] = useState({ username: '', password: '' });
+  const [activeTab, setActiveTab] = useState('productos');
+  
+  // Estados para productos
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [newProduct, setNewProduct] = useState({
+    nombre: '',
+    precio: '',
+    imagen: '',
+    stock: '',
+    sabores: []
+  });
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  
+  // Estados para sabores
+  const [newSabor, setNewSabor] = useState({ nombre: '', disponible: true });
+  const [editingSabores, setEditingSabores] = useState(false);
+
+  const [newBeneficio, setNewBeneficio] = useState({ icon: '', title: '', desc: '' });
+  const [editingBeneficio, setEditingBeneficio] = useState(null);
+  const [isAddingBeneficio, setIsAddingBeneficio] = useState(false);
+
+  const [newFaq, setNewFaq] = useState({ question: '', answer: '' });
+  const [editingFaq, setEditingFaq] = useState(null);
+  const [isAddingFaq, setIsAddingFaq] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const auth = localStorage.getItem('adminAuth') === 'true';
+      setIsAuthenticated(auth);
+    };
+
+    checkAuth();
+  }, []);
+
+  const handleInputChange = (e) => {
+    setLoginData({
+      ...loginData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleBeneficioInputChange = (e) => {
+    setNewBeneficio({
+      ...newBeneficio,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleFaqInputChange = (e) => {
+    setNewFaq({
+      ...newFaq,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleAddBeneficio = () => {
+    if (newBeneficio.icon && newBeneficio.title && newBeneficio.desc) {
+      const beneficio = {
+        icon: newBeneficio.icon,
+        title: newBeneficio.title,
+        desc: newBeneficio.desc,
+      };
+      updateBeneficios([...beneficios, beneficio]);
+      setNewBeneficio({ icon: '', title: '', desc: '' });
+      setIsAddingBeneficio(false);
+    }
+  };
+
+  const handleDeleteBeneficio = (index) => {
+    updateBeneficios(beneficios.filter((_, i) => i !== index));
+  };
+
+  const handleEditBeneficio = (index) => {
+    setEditingBeneficio({ ...beneficios[index], index });
+  };
+
+  const handleSaveBeneficio = () => {
+    const updatedBeneficios = [...beneficios];
+    updatedBeneficios[editingBeneficio.index] = {
+      icon: editingBeneficio.icon,
+      title: editingBeneficio.title,
+      desc: editingBeneficio.desc,
+    };
+    updateBeneficios(updatedBeneficios);
+    setEditingBeneficio(null);
+  };
+
+  const handleAddFaq = () => {
+    if (newFaq.question && newFaq.answer) {
+      const faq = {
+        question: newFaq.question,
+        answer: newFaq.answer,
+      };
+      updateFAQs([...faqs, faq]);
+      setNewFaq({ question: '', answer: '' });
+      setIsAddingFaq(false);
+    }
+  };
+
+  const handleDeleteFaq = (index) => {
+    updateFAQs(faqs.filter((_, i) => i !== index));
+  };
+
+  const handleEditFaq = (index) => {
+    setEditingFaq({ ...faqs[index], index });
+  };
+
+  const handleSaveFaq = () => {
+    const updatedFaqs = [...faqs];
+    updatedFaqs[editingFaq.index] = {
+      question: editingFaq.question,
+      answer: editingFaq.answer,
+    };
+    updateFAQs(updatedFaqs);
+    setEditingFaq(null);
+  };
 
   const handleLogin = async () => {
     try {
       const response = await fetch('/data/admin.json');
       const adminData = await response.json();
       
-      if (username === adminData.username && password === adminData.password) {
+      if (loginData.username === adminData.username && loginData.password === adminData.password) {
         setIsAuthenticated(true);
-        toast({
-          title: "¡Bienvenido!",
-          description: "Has iniciado sesión correctamente.",
-        });
+        localStorage.setItem('adminAuth', 'true');
       } else {
-        toast({
-          title: "Error",
-          description: "Usuario o contraseña incorrectos.",
-          variant: "destructive",
-        });
+        alert('Credenciales incorrectas');
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo verificar las credenciales.",
-        variant: "destructive",
-      });
+      console.error('Error al verificar credenciales:', error);
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setUsername('');
-    setPassword('');
+    localStorage.removeItem('adminAuth');
   };
 
-  const handleSaveProducto = (producto: Producto) => {
-    if (editingItem?.id) {
-      // Editar producto existente
-      const updatedProductos = productos.map(p => 
-        p.id === editingItem.id ? { ...producto, id: editingItem.id } : p
-      );
-      updateProductos(updatedProductos);
-      toast({
-        title: "Producto actualizado",
-        description: "El producto se ha actualizado correctamente.",
-      });
-    } else {
-      // Agregar nuevo producto
-      const newId = Math.max(...productos.map(p => p.id), 0) + 1;
-      const newProducto = { ...producto, id: newId };
-      updateProductos([...productos, newProducto]);
-      toast({
-        title: "Producto agregado",
-        description: "El producto se ha agregado correctamente.",
-      });
+  const handleAddProduct = () => {
+    if (newProduct.nombre && newProduct.precio && newProduct.stock) {
+      const product = {
+        id: Date.now(),
+        nombre: newProduct.nombre,
+        precio: parseInt(newProduct.precio),
+        imagen: newProduct.imagen || 'https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=' + encodeURIComponent(newProduct.nombre),
+        stock: parseInt(newProduct.stock),
+        sabores: newProduct.sabores
+      };
+      
+      updateProductos([...productos, product]);
+      setNewProduct({ nombre: '', precio: '', imagen: '', stock: '', sabores: [] });
+      setIsAddingProduct(false);
     }
-    setEditingItem(null);
-    setShowForm(false);
   };
 
-  const handleDeleteProducto = (id: number) => {
-    const updatedProductos = productos.filter(p => p.id !== id);
-    updateProductos(updatedProductos);
-    toast({
-      title: "Producto eliminado",
-      description: "El producto se ha eliminado correctamente.",
-    });
+  const handleDeleteProduct = (id) => {
+    updateProductos(productos.filter(p => p.id !== id));
   };
 
-  const handleSaveBeneficio = (beneficio: Beneficio, index?: number) => {
-    if (typeof index === 'number') {
-      // Editar beneficio existente
-      const updatedBeneficios = beneficios.map((b, i) => 
-        i === index ? beneficio : b
-      );
-      updateBeneficios(updatedBeneficios);
-      toast({
-        title: "Beneficio actualizado",
-        description: "El beneficio se ha actualizado correctamente.",
-      });
-    } else {
-      // Agregar nuevo beneficio
-      updateBeneficios([...beneficios, beneficio]);
-      toast({
-        title: "Beneficio agregado",
-        description: "El beneficio se ha agregado correctamente.",
-      });
+  const handleEditProduct = (product) => {
+    setEditingProduct({ ...product });
+  };
+
+  const handleSaveProduct = () => {
+    updateProductos(productos.map(p => p.id === editingProduct.id ? editingProduct : p));
+    setEditingProduct(null);
+  };
+
+  // Funciones para manejar sabores
+  const handleAddSaborToNew = () => {
+    if (newSabor.nombre.trim()) {
+      setNewProduct(prev => ({
+        ...prev,
+        sabores: [...prev.sabores, { ...newSabor }]
+      }));
+      setNewSabor({ nombre: '', disponible: true });
     }
-    setEditingItem(null);
-    setShowForm(false);
   };
 
-  const handleDeleteBeneficio = (index: number) => {
-    const updatedBeneficios = beneficios.filter((_, i) => i !== index);
-    updateBeneficios(updatedBeneficios);
-    toast({
-      title: "Beneficio eliminado",
-      description: "El beneficio se ha eliminado correctamente.",
-    });
+  const handleRemoveSaborFromNew = (index) => {
+    setNewProduct(prev => ({
+      ...prev,
+      sabores: prev.sabores.filter((_, i) => i !== index)
+    }));
   };
 
-  const handleSaveFAQ = (faq: FAQ, index?: number) => {
-    if (typeof index === 'number') {
-      // Editar FAQ existente
-      const updatedFAQs = faqs.map((f, i) => 
-        i === index ? faq : f
-      );
-      updateFAQs(updatedFAQs);
-      toast({
-        title: "Pregunta actualizada",
-        description: "La pregunta se ha actualizado correctamente.",
-      });
-    } else {
-      // Agregar nueva FAQ
-      updateFAQs([...faqs, faq]);
-      toast({
-        title: "Pregunta agregada",
-        description: "La pregunta se ha agregado correctamente.",
-      });
+  const handleAddSaborToEdit = () => {
+    if (newSabor.nombre.trim()) {
+      setEditingProduct(prev => ({
+        ...prev,
+        sabores: [...(prev.sabores || []), { ...newSabor }]
+      }));
+      setNewSabor({ nombre: '', disponible: true });
     }
-    setEditingItem(null);
-    setShowForm(false);
   };
 
-  const handleDeleteFAQ = (index: number) => {
-    const updatedFAQs = faqs.filter((_, i) => i !== index);
-    updateFAQs(updatedFAQs);
-    toast({
-      title: "Pregunta eliminada",
-      description: "La pregunta se ha eliminado correctamente.",
-    });
+  const handleRemoveSaborFromEdit = (index) => {
+    setEditingProduct(prev => ({
+      ...prev,
+      sabores: prev.sabores.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleToggleSaborDisponibilidad = (index, isEditing = false) => {
+    if (isEditing) {
+      setEditingProduct(prev => ({
+        ...prev,
+        sabores: prev.sabores.map((sabor, i) => 
+          i === index ? { ...sabor, disponible: !sabor.disponible } : sabor
+        )
+      }));
+    } else {
+      setNewProduct(prev => ({
+        ...prev,
+        sabores: prev.sabores.map((sabor, i) => 
+          i === index ? { ...sabor, disponible: !sabor.disponible } : sabor
+        )
+      }));
+    }
   };
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center mushroom-pattern">
-        <div className="hero-gradient absolute inset-0"></div>
-        <div className="relative z-10 bg-milan-cardBg backdrop-blur-sm rounded-2xl p-8 w-full max-w-md">
-          <div className="text-center mb-6">
-            <Lock className="w-12 h-12 text-milan-whatsapp mx-auto mb-4" />
-            <h1 className="text-2xl font-tan-nimbus text-milan-cream">Panel de Administración</h1>
-            <p className="text-milan-beige/70">Milan Vapes</p>
-          </div>
-          
-          <div className="space-y-4">
+      <div className="min-h-screen flex items-center justify-center bg-milan-darkGray">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle>Acceso Administrativo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <input
               type="text"
               placeholder="Usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-milan-productBg text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
+              value={loginData.username}
+              onChange={(e) => setLoginData(prev => ({ ...prev, username: e.target.value }))}
+              className="w-full p-2 border rounded"
             />
             <input
               type="password"
               placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-              className="w-full px-4 py-3 rounded-lg bg-milan-productBg text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
+              value={loginData.password}
+              onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
+              className="w-full p-2 border rounded"
             />
-            <button
-              onClick={handleLogin}
-              className="w-full bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige py-3 rounded-lg font-semibold transition-colors duration-200"
-            >
+            <Button onClick={handleLogin} className="w-full">
               Iniciar Sesión
-            </button>
-          </div>
-          
-          <button
-            onClick={() => navigate('/')}
-            className="mt-6 w-full flex items-center justify-center gap-2 text-milan-beige/70 hover:text-milan-beige transition-colors duration-200"
-          >
-            <Eye className="w-4 h-4" />
-            Ver sitio web
-          </button>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-milan-darkGray">
-      {/* Header */}
-      <div className="bg-milan-productBg border-b border-gray-600 px-6 py-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-tan-nimbus text-milan-cream">Panel de Administración - Milan Vapes</h1>
-          <div className="flex gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 px-4 py-2 bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige rounded-lg transition-colors duration-200"
-            >
-              <Eye className="w-4 h-4" />
-              Ver sitio
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
-            >
-              <LogOut className="w-4 h-4" />
-              Cerrar sesión
-            </button>
-          </div>
+    <div className="min-h-screen bg-milan-darkGray text-milan-cream p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Panel de Administración</h1>
+          <Button onClick={handleLogout} variant="outline">
+            Cerrar Sesión
+          </Button>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-600">
-        <div className="flex">
-          {(['productos', 'beneficios', 'faqs'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                setShowForm(false);
-                setEditingItem(null);
-              }}
-              className={`px-6 py-3 font-medium capitalize transition-colors duration-200 ${
-                activeTab === tab
-                  ? 'bg-milan-whatsapp text-milan-beige border-b-2 border-milan-whatsapp'
-                  : 'text-milan-beige/70 hover:text-milan-beige hover:bg-milan-productBg/50'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="flex space-x-4 mb-8">
+          <Button 
+            onClick={() => setActiveTab('productos')}
+            variant={activeTab === 'productos' ? 'default' : 'outline'}
+          >
+            Productos
+          </Button>
+          <Button 
+            onClick={() => setActiveTab('beneficios')}
+            variant={activeTab === 'beneficios' ? 'default' : 'outline'}
+          >
+            Beneficios
+          </Button>
+          <Button 
+            onClick={() => setActiveTab('faqs')}
+            variant={activeTab === 'faqs' ? 'default' : 'outline'}
+          >
+            FAQs
+          </Button>
         </div>
-      </div>
 
-      <div className="p-6">
-        {/* Content based on active tab */}
         {activeTab === 'productos' && (
-          <ProductosAdmin
-            productos={productos}
-            onSave={handleSaveProducto}
-            onDelete={handleDeleteProducto}
-            editingItem={editingItem}
-            setEditingItem={setEditingItem}
-            showForm={showForm}
-            setShowForm={setShowForm}
-          />
-        )}
-        
-        {activeTab === 'beneficios' && (
-          <BeneficiosAdmin
-            beneficios={beneficios}
-            onSave={handleSaveBeneficio}
-            onDelete={handleDeleteBeneficio}
-            editingItem={editingItem}
-            setEditingItem={setEditingItem}
-            showForm={showForm}
-            setShowForm={setShowForm}
-          />
-        )}
-        
-        {activeTab === 'faqs' && (
-          <FAQAdmin
-            faqs={faqs}
-            onSave={handleSaveFAQ}
-            onDelete={handleDeleteFAQ}
-            editingItem={editingItem}
-            setEditingItem={setEditingItem}
-            showForm={showForm}
-            setShowForm={setShowForm}
-          />
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Componente para administrar productos
-const ProductosAdmin: React.FC<{
-  productos: Producto[];
-  onSave: (producto: Producto) => void;
-  onDelete: (id: number) => void;
-  editingItem: any;
-  setEditingItem: (item: any) => void;
-  showForm: boolean;
-  setShowForm: (show: boolean) => void;
-}> = ({ productos, onSave, onDelete, editingItem, setEditingItem, showForm, setShowForm }) => {
-  const [formData, setFormData] = useState<Producto>({
-    id: 0,
-    nombre: '',
-    precio: 0,
-    imagen: '',
-    stock: 0,
-    sabores: []
-  });
-
-  useEffect(() => {
-    if (editingItem) {
-      setFormData(editingItem);
-    } else {
-      setFormData({
-        id: 0,
-        nombre: '',
-        precio: 0,
-        imagen: '',
-        stock: 0,
-        sabores: []
-      });
-    }
-  }, [editingItem]);
-
-  const handleAddSabor = () => {
-    setFormData({
-      ...formData,
-      sabores: [...formData.sabores, { nombre: '', disponible: true }]
-    });
-  };
-
-  const handleRemoveSabor = (index: number) => {
-    const newSabores = formData.sabores.filter((_, i) => i !== index);
-    setFormData({ ...formData, sabores: newSabores });
-  };
-
-  const handleSaborChange = (index: number, field: 'nombre' | 'disponible', value: string | boolean) => {
-    const newSabores = formData.sabores.map((sabor, i) =>
-      i === index ? { ...sabor, [field]: value } : sabor
-    );
-    setFormData({ ...formData, sabores: newSabores });
-  };
-
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-milan-cream">Gestión de Productos</h2>
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingItem(null);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige rounded-lg transition-colors duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          Agregar Producto
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-milan-productBg rounded-lg p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-milan-cream">
-              {editingItem ? 'Editar Producto' : 'Nuevo Producto'}
-            </h3>
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setEditingItem(null);
-              }}
-              className="text-gray-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Nombre del producto"
-              value={formData.nombre}
-              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-              className="px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-            <input
-              type="number"
-              placeholder="Precio"
-              value={formData.precio || ''}
-              onChange={(e) => setFormData({ ...formData, precio: Number(e.target.value) })}
-              className="px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-            <input
-              type="text"
-              placeholder="URL de la imagen"
-              value={formData.imagen}
-              onChange={(e) => setFormData({ ...formData, imagen: e.target.value })}
-              className="px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-            <input
-              type="number"
-              placeholder="Stock"
-              value={formData.stock || ''}
-              onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
-              className="px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-          </div>
-
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <label className="text-milan-beige font-medium">Sabores</label>
-              <button
-                onClick={handleAddSabor}
-                className="text-milan-whatsapp hover:text-milan-whatsapp/80"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold">Productos</h2>
+              <Button onClick={() => setIsAddingProduct(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar Producto
+              </Button>
             </div>
-            
-            <div className="space-y-2">
-              {formData.sabores.map((sabor, index) => (
-                <div key={index} className="flex items-center gap-2">
+
+            {isAddingProduct && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Nuevo Producto</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <input
                     type="text"
-                    placeholder="Nombre del sabor"
-                    value={sabor.nombre}
-                    onChange={(e) => handleSaborChange(index, 'nombre', e.target.value)}
-                    className="flex-1 px-3 py-2 rounded bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
+                    placeholder="Nombre del producto"
+                    value={newProduct.nombre}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, nombre: e.target.value }))}
+                    className="w-full p-2 border rounded"
                   />
-                  <label className="flex items-center gap-2 text-milan-beige">
-                    <input
-                      type="checkbox"
-                      checked={sabor.disponible}
-                      onChange={(e) => handleSaborChange(index, 'disponible', e.target.checked)}
-                      className="rounded"
-                    />
-                    Disponible
-                  </label>
-                  <button
-                    onClick={() => handleRemoveSabor(index)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                  <input
+                    type="number"
+                    placeholder="Precio"
+                    value={newProduct.precio}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, precio: e.target.value }))}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="url"
+                    placeholder="URL de la imagen"
+                    value={newProduct.imagen}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, imagen: e.target.value }))}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Stock"
+                    value={newProduct.stock}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, stock: e.target.value }))}
+                    className="w-full p-2 border rounded"
+                  />
+                  
+                  {/* Sección de sabores */}
+                  <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-3">Sabores</h4>
+                    <div className="flex gap-2 mb-3">
+                      <input
+                        type="text"
+                        placeholder="Nombre del sabor"
+                        value={newSabor.nombre}
+                        onChange={(e) => setNewSabor(prev => ({ ...prev, nombre: e.target.value }))}
+                        className="flex-1 p-2 border rounded"
+                      />
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={newSabor.disponible}
+                          onChange={(e) => setNewSabor(prev => ({ ...prev, disponible: e.target.checked }))}
+                        />
+                        Disponible
+                      </label>
+                      <Button onClick={handleAddSaborToNew} size="sm">
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      {newProduct.sabores.map((sabor, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Badge 
+                            variant={sabor.disponible ? "default" : "secondary"}
+                            className="cursor-pointer"
+                            onClick={() => handleToggleSaborDisponibilidad(index)}
+                          >
+                            {sabor.nombre}
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleRemoveSaborFromNew(index)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button onClick={handleAddProduct}>
+                      <Save className="w-4 h-4 mr-2" />
+                      Guardar
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsAddingProduct(false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {productos.map((producto) => (
+                <Card key={producto.id}>
+                  <CardContent className="p-4">
+                    {editingProduct?.id === producto.id ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={editingProduct.nombre}
+                          onChange={(e) => setEditingProduct(prev => ({ ...prev, nombre: e.target.value }))}
+                          className="w-full p-2 border rounded"
+                        />
+                        <input
+                          type="number"
+                          value={editingProduct.precio}
+                          onChange={(e) => setEditingProduct(prev => ({ ...prev, precio: parseInt(e.target.value) }))}
+                          className="w-full p-2 border rounded"
+                        />
+                        <input
+                          type="url"
+                          value={editingProduct.imagen}
+                          onChange={(e) => setEditingProduct(prev => ({ ...prev, imagen: e.target.value }))}
+                          className="w-full p-2 border rounded"
+                        />
+                        <input
+                          type="number"
+                          value={editingProduct.stock}
+                          onChange={(e) => setEditingProduct(prev => ({ ...prev, stock: parseInt(e.target.value) }))}
+                          className="w-full p-2 border rounded"
+                        />
+                        
+                        {/* Sección de sabores para edición */}
+                        <div className="border-t pt-3">
+                          <h4 className="font-semibold mb-2">Sabores</h4>
+                          <div className="flex gap-2 mb-2">
+                            <input
+                              type="text"
+                              placeholder="Nuevo sabor"
+                              value={newSabor.nombre}
+                              onChange={(e) => setNewSabor(prev => ({ ...prev, nombre: e.target.value }))}
+                              className="flex-1 p-1 border rounded text-sm"
+                            />
+                            <label className="flex items-center gap-1 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={newSabor.disponible}
+                                onChange={(e) => setNewSabor(prev => ({ ...prev, disponible: e.target.checked }))}
+                              />
+                              Disp.
+                            </label>
+                            <Button onClick={handleAddSaborToEdit} size="sm">
+                              <Plus className="w-3 h-3" />
+                            </Button>
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-1">
+                            {(editingProduct.sabores || []).map((sabor, index) => (
+                              <div key={index} className="flex items-center gap-1">
+                                <Badge 
+                                  variant={sabor.disponible ? "default" : "secondary"}
+                                  className="text-xs cursor-pointer"
+                                  onClick={() => handleToggleSaborDisponibilidad(index, true)}
+                                >
+                                  {sabor.nombre}
+                                </Badge>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleRemoveSaborFromEdit(index)}
+                                  className="h-5 w-5 p-0"
+                                >
+                                  <X className="w-2 h-2" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button onClick={handleSaveProduct} size="sm">
+                            <Save className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" onClick={() => setEditingProduct(null)} size="sm">
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <img
+                          src={producto.imagen}
+                          alt={producto.nombre}
+                          className="w-full h-32 object-cover rounded mb-3"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://via.placeholder.com/300x200/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
+                          }}
+                        />
+                        <h3 className="font-semibold">{producto.nombre}</h3>
+                        <p className="text-lg font-bold text-green-600">${producto.precio.toLocaleString()}</p>
+                        <p className="text-sm text-gray-600">Stock: {producto.stock}</p>
+                        
+                        {producto.sabores && producto.sabores.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-xs text-gray-500 mb-1">Sabores:</p>
+                            <div className="flex flex-wrap gap-1">
+                              {producto.sabores.map((sabor, index) => (
+                                <Badge 
+                                  key={index}
+                                  variant={sabor.disponible ? "default" : "secondary"}
+                                  className="text-xs"
+                                >
+                                  {sabor.nombre}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button onClick={() => handleEditProduct(producto)} size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button onClick={() => handleDeleteProduct(producto.id)} variant="destructive" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
+        )}
 
-          <button
-            onClick={() => onSave(formData)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
-          >
-            <Save className="w-4 h-4" />
-            Guardar
-          </button>
-        </div>
-      )}
+        {activeTab === 'beneficios' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold">Beneficios</h2>
+              <Button onClick={() => setIsAddingBeneficio(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar Beneficio
+              </Button>
+            </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {productos.map((producto) => (
-          <div key={producto.id} className="bg-milan-productBg rounded-lg p-4">
-            <img
-              src={producto.imagen}
-              alt={producto.nombre}
-              className="w-full h-32 object-cover rounded mb-3"
-              onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/300x200/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
-              }}
-            />
-            <h3 className="text-milan-beige font-semibold mb-1">{producto.nombre}</h3>
-            <p className="text-milan-whatsapp font-bold mb-1">${producto.precio.toLocaleString()}</p>
-            <p className="text-gray-300 text-sm mb-2">Stock: {producto.stock}</p>
-            <p className="text-gray-300 text-sm mb-3">
-              Sabores: {producto.sabores.filter(s => s.disponible).length} disponibles
-            </p>
-            
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setEditingItem(producto);
-                  setShowForm(true);
-                }}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors duration-200"
-              >
-                <Edit className="w-3 h-3" />
-                Editar
-              </button>
-              <button
-                onClick={() => onDelete(producto.id)}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors duration-200"
-              >
-                <Trash2 className="w-3 h-3" />
-                Eliminar
-              </button>
+            {isAddingBeneficio && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Nuevo Beneficio</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Icono (emoji)"
+                    name="icon"
+                    value={newBeneficio.icon}
+                    onChange={handleBeneficioInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Título"
+                    name="title"
+                    value={newBeneficio.title}
+                    onChange={handleBeneficioInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <textarea
+                    placeholder="Descripción"
+                    name="desc"
+                    value={newBeneficio.desc}
+                    onChange={handleBeneficioInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <div className="flex gap-2">
+                    <Button onClick={handleAddBeneficio}>
+                      <Save className="w-4 h-4 mr-2" />
+                      Guardar
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsAddingBeneficio(false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {beneficios.map((beneficio, index) => (
+                <Card key={index}>
+                  <CardContent className="p-4">
+                    {editingBeneficio?.index === index ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={editingBeneficio.icon}
+                          onChange={(e) => setEditingBeneficio({ ...editingBeneficio, icon: e.target.value })}
+                          className="w-full p-2 border rounded"
+                        />
+                        <input
+                          type="text"
+                          value={editingBeneficio.title}
+                          onChange={(e) => setEditingBeneficio({ ...editingBeneficio, title: e.target.value })}
+                          className="w-full p-2 border rounded"
+                        />
+                        <textarea
+                          value={editingBeneficio.desc}
+                          onChange={(e) => setEditingBeneficio({ ...editingBeneficio, desc: e.target.value })}
+                          className="w-full p-2 border rounded"
+                        />
+                        <div className="flex gap-2">
+                          <Button onClick={handleSaveBeneficio}>
+                            <Save className="w-4 h-4 mr-2" />
+                          </Button>
+                          <Button variant="outline" onClick={() => setEditingBeneficio(null)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="font-semibold">{beneficio.title}</h3>
+                        <p className="text-sm text-gray-600">{beneficio.desc}</p>
+                        <div className="flex gap-2 mt-4">
+                          <Button onClick={() => handleEditBeneficio(index)} size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button onClick={() => handleDeleteBeneficio(index)} variant="destructive" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+        )}
 
-// Componente para administrar beneficios
-const BeneficiosAdmin: React.FC<{
-  beneficios: Beneficio[];
-  onSave: (beneficio: Beneficio, index?: number) => void;
-  onDelete: (index: number) => void;
-  editingItem: any;
-  setEditingItem: (item: any) => void;
-  showForm: boolean;
-  setShowForm: (show: boolean) => void;
-}> = ({ beneficios, onSave, onDelete, editingItem, setEditingItem, showForm, setShowForm }) => {
-  const [formData, setFormData] = useState<Beneficio>({
-    icon: '',
-    title: '',
-    desc: ''
-  });
-
-  useEffect(() => {
-    if (editingItem) {
-      setFormData(editingItem.data);
-    } else {
-      setFormData({
-        icon: '',
-        title: '',
-        desc: ''
-      });
-    }
-  }, [editingItem]);
-
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-milan-cream">Gestión de Beneficios</h2>
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingItem(null);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige rounded-lg transition-colors duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          Agregar Beneficio
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-milan-productBg rounded-lg p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-milan-cream">
-              {editingItem ? 'Editar Beneficio' : 'Nuevo Beneficio'}
-            </h3>
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setEditingItem(null);
-              }}
-              className="text-gray-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Emoji (ej: 🚚)"
-              value={formData.icon}
-              onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-            <input
-              type="text"
-              placeholder="Título del beneficio"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-            <textarea
-              placeholder="Descripción del beneficio"
-              value={formData.desc}
-              onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none resize-none"
-            />
-          </div>
-
-          <button
-            onClick={() => onSave(formData, editingItem?.index)}
-            className="mt-4 flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
-          >
-            <Save className="w-4 h-4" />
-            Guardar
-          </button>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {beneficios.map((beneficio, index) => (
-          <div key={index} className="bg-milan-productBg rounded-lg p-4">
-            <div className="text-center mb-3">
-              <div className="text-3xl mb-2">{beneficio.icon}</div>
-              <h3 className="text-milan-beige font-semibold mb-1">{beneficio.title}</h3>
-              <p className="text-gray-300 text-sm">{beneficio.desc}</p>
+        {activeTab === 'faqs' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold">FAQs</h2>
+              <Button onClick={() => setIsAddingFaq(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar FAQ
+              </Button>
             </div>
-            
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setEditingItem({ data: beneficio, index });
-                  setShowForm(true);
-                }}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors duration-200"
-              >
-                <Edit className="w-3 h-3" />
-                Editar
-              </button>
-              <button
-                onClick={() => onDelete(index)}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors duration-200"
-              >
-                <Trash2 className="w-3 h-3" />
-                Eliminar
-              </button>
+
+            {isAddingFaq && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>Nueva FAQ</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Pregunta"
+                    name="question"
+                    value={newFaq.question}
+                    onChange={handleFaqInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <textarea
+                    placeholder="Respuesta"
+                    name="answer"
+                    value={newFaq.answer}
+                    onChange={handleFaqInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                  <div className="flex gap-2">
+                    <Button onClick={handleAddFaq}>
+                      <Save className="w-4 h-4 mr-2" />
+                      Guardar
+                    </Button>
+                    <Button variant="outline" onClick={() => setIsAddingFaq(false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {faqs.map((faq, index) => (
+                <Card key={index}>
+                  <CardContent className="p-4">
+                    {editingFaq?.index === index ? (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          value={editingFaq.question}
+                          onChange={(e) => setEditingFaq({ ...editingFaq, question: e.target.value })}
+                          className="w-full p-2 border rounded"
+                        />
+                        <textarea
+                          value={editingFaq.answer}
+                          onChange={(e) => setEditingFaq({ ...editingFaq, answer: e.target.value })}
+                          className="w-full p-2 border rounded"
+                        />
+                        <div className="flex gap-2">
+                          <Button onClick={handleSaveFaq}>
+                            <Save className="w-4 h-4 mr-2" />
+                          </Button>
+                          <Button variant="outline" onClick={() => setEditingFaq(null)}>
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3 className="font-semibold">{faq.question}</h3>
+                        <p className="text-sm text-gray-600">{faq.answer}</p>
+                        <div className="flex gap-2 mt-4">
+                          <Button onClick={() => handleEditFaq(index)} size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button onClick={() => handleDeleteFaq(index)} variant="destructive" size="sm">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Componente para administrar FAQs
-const FAQAdmin: React.FC<{
-  faqs: FAQ[];
-  onSave: (faq: FAQ, index?: number) => void;
-  onDelete: (index: number) => void;
-  editingItem: any;
-  setEditingItem: (item: any) => void;
-  showForm: boolean;
-  setShowForm: (show: boolean) => void;
-}> = ({ faqs, onSave, onDelete, editingItem, setEditingItem, showForm, setShowForm }) => {
-  const [formData, setFormData] = useState<FAQ>({
-    question: '',
-    answer: ''
-  });
-
-  useEffect(() => {
-    if (editingItem) {
-      setFormData(editingItem.data);
-    } else {
-      setFormData({
-        question: '',
-        answer: ''
-      });
-    }
-  }, [editingItem]);
-
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-milan-cream">Gestión de Preguntas Frecuentes</h2>
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingItem(null);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige rounded-lg transition-colors duration-200"
-        >
-          <Plus className="w-4 h-4" />
-          Agregar Pregunta
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-milan-productBg rounded-lg p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-milan-cream">
-              {editingItem ? 'Editar Pregunta' : 'Nueva Pregunta'}
-            </h3>
-            <button
-              onClick={() => {
-                setShowForm(false);
-                setEditingItem(null);
-              }}
-              className="text-gray-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Pregunta"
-              value={formData.question}
-              onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none"
-            />
-            <textarea
-              placeholder="Respuesta"
-              value={formData.answer}
-              onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-2 rounded-lg bg-milan-darkGray text-milan-beige border border-gray-600 focus:border-milan-whatsapp focus:outline-none resize-none"
-            />
-          </div>
-
-          <button
-            onClick={() => onSave(formData, editingItem?.index)}
-            className="mt-4 flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
-          >
-            <Save className="w-4 h-4" />
-            Guardar
-          </button>
-        </div>
-      )}
-
-      <div className="space-y-4">
-        {faqs.map((faq, index) => (
-          <div key={index} className="bg-milan-productBg rounded-lg p-4">
-            <div className="mb-3">
-              <h3 className="text-milan-beige font-semibold mb-2">{faq.question}</h3>
-              <p className="text-gray-300 text-sm">{faq.answer}</p>
-            </div>
-            
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setEditingItem({ data: faq, index });
-                  setShowForm(true);
-                }}
-                className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors duration-200"
-              >
-                <Edit className="w-3 h-3" />
-                Editar
-              </button>
-              <button
-                onClick={() => onDelete(index)}
-                className="flex items-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-colors duration-200"
-              >
-                <Trash2 className="w-3 h-3" />
-                Eliminar
-              </button>
-            </div>
-          </div>
-        ))}
+        )}
       </div>
     </div>
   );

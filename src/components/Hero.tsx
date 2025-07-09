@@ -9,7 +9,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative mushroom-pattern">
+    <section className="min-h-screen flex items-center justify-center relative">
       <div className="hero-gradient absolute inset-0"></div>
       
       <div className="relative z-10 text-center px-4 animate-fade-in">
@@ -26,7 +26,7 @@ const Hero = () => {
         
         <button
           onClick={scrollToProducts}
-          className="bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-float"
+          className="bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige px-12 py-5 rounded-full text-lg font-semibold transition-all duration-500 transform hover:scale-105 hover:shadow-2xl animate-float"
         >
           Ver nuestros productos
         </button>
