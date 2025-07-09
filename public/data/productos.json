@@ -1,0 +1,81 @@
+
+[
+  {
+    "id": 1,
+    "nombre": "Elfbar 40k",
+    "precio": 34000,
+    "imagen": "https://res.cloudinary.com/dycggf3sj/image/upload/v1752074518/MilanVapes/elfbar_ir5hbe.webp",
+    "stock": 1,
+    "sabores": [
+      { "nombre": "Cherry strazz", "disponible": false },
+      { "nombre": "Scary berry", "disponible": false },
+      { "nombre": "Sour strawberry drago", "disponible": false },
+      { "nombre": "Dragon strawana", "disponible": true }
+    ]
+  },
+  {
+    "id": 2,
+    "nombre": "Geekbar pulse 25k",
+    "precio": 25000,
+    "imagen": "https://res.cloudinary.com/dycggf3sj/image/upload/v1752074516/MilanVapes/geekbar_kxwoml.webp",
+    "stock": 2,
+    "sabores": [
+      { "nombre": "Miami mint", "disponible": true },
+      { "nombre": "Cool mint", "disponible": true }
+    ]
+  },
+  {
+    "id": 3,
+    "nombre": "Oxbar 30k",
+    "precio": 29000,
+    "imagen": "https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=Oxbar+30k",
+    "stock": 2,
+    "sabores": [
+      { "nombre": "Sour Mango", "disponible": true },
+      { "nombre": "Raspberry lemon", "disponible": true }
+    ]
+  },
+  {
+    "id": 4,
+    "nombre": "Waka 36k",
+    "precio": 29000,
+    "imagen": "https://res.cloudinary.com/dycggf3sj/image/upload/v1752074517/MilanVapes/waka_knwqjl.png",
+    "stock": 2,
+    "sabores": [
+      { "nombre": "Strawberry banana", "disponible": true },
+      { "nombre": "Grape", "disponible": true }
+    ]
+  },
+  {
+    "id": 5,
+    "nombre": "Ignite v250 25k",
+    "precio": 28000,
+    "imagen": "https://res.cloudinary.com/dycggf3sj/image/upload/v1752074514/MilanVapes/ignite_tczx27.webp",
+    "stock": 0,
+    "sabores": [
+      { "nombre": "Menthol", "disponible": false }
+    ]
+  },
+  {
+    "id": 6,
+    "nombre": "Lifepod 20k",
+    "precio": 26500,
+    "imagen": "https://res.cloudinary.com/dycggf3sj/image/upload/v1752074515/MilanVapes/lifepod_xplrl1.jpg",
+    "stock": 1,
+    "sabores": [
+      { "nombre": "Blue raspberry frost", "disponible": false },
+      { "nombre": "Strawberry kiwi frost", "disponible": true }
+    ]
+  },
+  {
+    "id": 7,
+    "nombre": "Lost Ángel 28k",
+    "precio": 24000,
+    "imagen": "https://res.cloudinary.com/dycggf3sj/image/upload/v1752074524/MilanVapes/lost-angel_zth5uq.jpg",
+    "stock": 2,
+    "sabores": [
+      { "nombre": "Blueberry cotton candy", "disponible": true },
+      { "nombre": "Strawberry banana", "disponible": true }
+    ]
+  }
+]

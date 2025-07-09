@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,4 +103,50 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom styles for Milan Vapes */
+.mushroom-pattern {
+  background-image: url('/lovable-uploads/e87dd238-d0e5-48ed-9e19-c55c6cfbc9ed.png');
+  background-size: 150px 150px;
+  background-repeat: repeat;
+  background-position: center;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%);
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Animación para elementos que aparecen al hacer scroll */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.animate-on-scroll.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Personalización del scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #181A1B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8F9779;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7a8468;
 }

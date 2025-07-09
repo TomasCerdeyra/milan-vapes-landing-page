@@ -1,0 +1,9 @@
+
+[
+  { "icon": "🚚", "title": "Envíos rápidos", "desc": "Recibí tu pedido en tiempo récord." },
+  { "icon": "💬", "title": "Atención personalizada", "desc": "Te asesoramos antes y después de tu compra." },
+  { "icon": "✅", "title": "Productos originales", "desc": "Solo vendemos productos 100% originales." },
+  { "icon": "💸", "title": "Mejor precio", "desc": "Precios competitivos y ofertas exclusivas." },
+  { "icon": "🔒", "title": "Compra segura", "desc": "Tus datos y pagos están protegidos." },
+  { "icon": "📍", "title": "Somos de tu ciudad", "desc": "Estamos en Baradero. ¡Comprá local y recibí rápido!" }
+]

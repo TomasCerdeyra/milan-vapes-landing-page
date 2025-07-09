@@ -1,0 +1,27 @@
+
+[
+  {
+    "question": "¿Cuánto tarda en llegar mi pedido?",
+    "answer": "Los envíos locales llegan en el día. Envíos a otras ciudades demoran entre 2 y 5 días hábiles."
+  },
+  {
+    "question": "¿Cómo puedo pagar mi compra?",
+    "answer": "Aceptamos efectivo, transferencia bancaria y Mercado Pago."
+  },
+  {
+    "question": "¿Los productos son originales?",
+    "answer": "Sí, todos nuestros productos son 100% originales y cuentan con garantía."
+  },
+  {
+    "question": "¿Hacen envíos a todo el país?",
+    "answer": "Sí, realizamos envíos a todo el país por correo o mensajería privada."
+  },
+  {
+    "question": "¿Tienen garantía los productos?",
+    "answer": "Sí, todos nuestros productos cuentan con garantía por defectos de fábrica."
+  },
+  {
+    "question": "¿Puedo cambiar el sabor después de hacer el pedido?",
+    "answer": "El cambio de sabor debe solicitarse antes de que el pedido sea enviado contactándonos por WhatsApp."
+  }
+]
