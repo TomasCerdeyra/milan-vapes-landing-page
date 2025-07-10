@@ -21,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
         <img
           src={producto.imagen}
           alt={producto.nombre}
-          className="w-full h-48 sm:h-56 md:h-64 lg:h-80 object-contain bg-white"
+          className="w-full h-48 sm:h-56 md:h-64 lg:h-80 object-cover bg-white"
           onError={(e) => {
             e.currentTarget.src = 'https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
           }}
