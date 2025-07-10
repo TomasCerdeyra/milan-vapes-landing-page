@@ -21,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
         <img
           src={producto.imagen}
           alt={producto.nombre}
-          className="w-full h-64 object-contain bg-white"
+          className="w-full h-80 object-contain bg-white"
           onError={(e) => {
             e.currentTarget.src = 'https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
           }}
@@ -31,9 +31,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
       <div className="p-6 flex-1 flex flex-col">
         <div className="mb-4">
           <h3 className="text-xl font-bold text-milan-beige mb-2">{producto.nombre}</h3>
-          <p className="text-2xl font-bold text-milan-whatsapp mb-3">${producto.precio.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-milan-whatsapp mb-4">${producto.precio.toLocaleString()}</p>
           
-          {/* Stock Badge debajo del precio */}
+          {/* Botón de WhatsApp debajo del precio */}
+          <div className="mb-4">
+            <a
+              href={generateWhatsAppLink(selectedSabor)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`block w-full text-center py-3 rounded-xl font-semibold transition-all duration-300 ${
+                producto.stock > 0
+                  ? 'bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige hover:shadow-lg transform hover:scale-105'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+              onClick={producto.stock === 0 ? (e) => e.preventDefault() : undefined}
+            >
+              {producto.stock > 0 ? 'Pedir por WhatsApp' : 'Sin stock disponible'}
+            </a>
+          </div>
+          
+          {/* Stock Badge debajo del botón */}
           <div className="mb-4">
             {producto.stock > 0 ? (
               <span className="bg-milan-stockAlert text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -47,11 +64,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
           </div>
         </div>
         
-        <div className="flex-1 flex flex-col justify-between">
+        <div className="flex-1 flex flex-col">
           {producto.sabores && producto.sabores.length > 0 && (
-            <div className="mb-6">
+            <div>
               <p className="text-milan-beige mb-3 font-semibold">Sabores disponibles:</p>
-              <div className="flex flex-wrap gap-2 mb-4 h-16">
+              <div className="flex flex-wrap gap-2 h-16">
                 {producto.sabores.map((sabor, index) => (
                   <button
                     key={index}
@@ -71,23 +88,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
               </div>
             </div>
           )}
-          
-          {/* Botón de WhatsApp siempre en la misma posición */}
-          <div className="mt-auto">
-            <a
-              href={generateWhatsAppLink(selectedSabor)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`block w-full text-center py-3 rounded-xl font-semibold transition-all duration-300 ${
-                producto.stock > 0
-                  ? 'bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige hover:shadow-lg transform hover:scale-105'
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              }`}
-              onClick={producto.stock === 0 ? (e) => e.preventDefault() : undefined}
-            >
-              {producto.stock > 0 ? 'Pedir por WhatsApp' : 'Sin stock disponible'}
-            </a>
-          </div>
         </div>
       </div>
     </div>
