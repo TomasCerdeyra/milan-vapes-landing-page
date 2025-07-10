@@ -21,7 +21,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
         <img
           src={producto.imagen}
           alt={producto.nombre}
-          className="w-full h-64 md:h-80 lg:h-96 object-cover bg-white"
+          className="w-full h-48 sm:h-56 md:h-64 lg:h-80 object-contain bg-white"
           onError={(e) => {
             e.currentTarget.src = 'https://via.placeholder.com/300x400/4A4A4A/FFFFFF?text=' + encodeURIComponent(producto.nombre);
           }}
@@ -39,7 +39,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
               href={generateWhatsAppLink(selectedSabor)}
               target="_blank"
               rel="noopener noreferrer"
-              className={`block w-full text-center py-3 rounded-xl font-semibold transition-all duration-300 ${
+              className={`inline-block text-center py-2 px-3 rounded-full text-sm font-semibold transition-all duration-300 ${
                 producto.stock > 0
                   ? 'bg-milan-whatsapp hover:bg-milan-whatsapp/90 text-milan-beige hover:shadow-lg transform hover:scale-105'
                   : 'bg-gray-600 text-gray-400 cursor-not-allowed'
@@ -68,13 +68,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ producto }) => {
           {producto.sabores && producto.sabores.length > 0 && (
             <div>
               <p className="text-milan-beige mb-3 font-semibold">Sabores disponibles:</p>
-              <div className="flex flex-wrap gap-2 h-16">
+              <div className="flex flex-wrap gap-2 h-20 sm:h-16">
                 {producto.sabores.map((sabor, index) => (
                   <button
                     key={index}
                     onClick={() => producto.stock > 0 && sabor.disponible ? setSelectedSabor(sabor.nombre) : null}
                     disabled={producto.stock === 0 || !sabor.disponible}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 h-8 ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 h-10 ${
                       producto.stock > 0 && sabor.disponible
                         ? selectedSabor === sabor.nombre
                           ? 'bg-milan-whatsapp text-milan-darkGray'
