@@ -14,14 +14,14 @@ const Hero = () => {
       
       <div className="relative z-10 text-center px-4 animate-fade-in">
         <h1 className="text-8xl md:text-9xl lg:text-[12rem] font-tan-nimbus font-bold text-milan-cream mb-4 tracking-wider">
-          MILAN
+          Milan
         </h1>
         <h2 className="text-6xl md:text-7xl lg:text-8xl font-perandory font-light text-milan-cream mb-8 tracking-widest">
-          VAPES
+          Vapes
         </h2>
         
-        <p className="text-xl md:text-2xl text-milan-beige mb-12 max-w-2xl mx-auto leading-relaxed">
-          Los mejores vapes originales de Baradero. Calidad garantizada, envíos rápidos y atención personalizada.
+        <p className="text-xl md:text-2xl  text-milan-beige mb-12 max-w-2xl mx-auto leading-relaxed">
+          Los mejores vapes originales de Baradero. Calidad garantizada, mejor presentacion y atención personalizada.
         </p>
         
         <button

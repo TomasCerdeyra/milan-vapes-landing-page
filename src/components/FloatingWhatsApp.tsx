@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 
@@ -13,7 +12,6 @@ const FloatingWhatsApp = () => {
       setIsVisible(true);
     }, 2000);
 
-    // Ocultar tooltip después de 5 segundos
     const tooltipTimer = setTimeout(() => {
       setShowTooltip(false);
     }, 7000);
@@ -30,7 +28,7 @@ const FloatingWhatsApp = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Tooltip */}
       {showTooltip && (
-        <div className="absolute bottom-16 right-0 bg-milan-darkGray text-milan-beige px-4 py-2 rounded-lg shadow-lg animate-fade-in mb-2 min-w-48">
+        <div className="absolute bottom-16 right-0 bg-milan-darkGray text-milan-beige px-4 py-2 rounded-lg shadow-lg animate-fade-in mb-2 min-w-48 z-50">
           <div className="flex justify-between items-center">
             <span className="text-sm">¡Hola! ¿Te ayudamos?</span>
             <button
@@ -44,18 +42,21 @@ const FloatingWhatsApp = () => {
         </div>
       )}
       
-      {/* WhatsApp Button */}
-      <a
-        href={whatsappLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-center w-14 h-14 bg-milan-whatsappGreen hover:bg-milan-whatsappGreen/90 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 animate-float"
-      >
-        <MessageCircle className="w-7 h-7 text-white" />
-      </a>
-      
-      {/* Pulse animation */}
-      <div className="absolute inset-0 rounded-full bg-milan-whatsappGreen/30 animate-ping"></div>
+      {/* WhatsApp Button Container - Added relative and z-index */}
+      <div className="relative">
+        {/* Pulse animation - Moved before the button and adjusted z-index */}
+        <div className="absolute inset-0 rounded-full bg-milan-whatsappGreen/30 animate-ping z-0"></div>
+        
+        {/* WhatsApp Button - Increased z-index */}
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative flex items-center justify-center w-14 h-14 bg-milan-whatsappGreen hover:bg-milan-whatsappGreen/90 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 animate-float z-10"
+        >
+          <MessageCircle className="w-7 h-7 text-white" />
+        </a>
+      </div>
     </div>
   );
 };

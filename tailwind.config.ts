@@ -76,8 +76,8 @@ export default {
 				}
 			},
 			fontFamily: {
-				'tan-nimbus': ['Bebas Neue', 'sans-serif'],
-				'perandory': ['Oswald', 'sans-serif'],
+				'tan-nimbus': ['tan-nimbus', 'sans-serif'],
+				'perandory': ['perandory', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

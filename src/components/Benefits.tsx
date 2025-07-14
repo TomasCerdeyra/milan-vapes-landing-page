@@ -11,7 +11,7 @@ const Benefits = () => {
       
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-on-scroll">
-          <h2 className="text-5xl md:text-6xl font-tan-nimbus text-milan-lightGray mb-6">
+          <h2 className="text-5xl md:text-6xl font-perandory tracking-wider text-milan-lightGray mb-6">
             ¿POR QUÉ ELEGIR MILAN VAPES?
           </h2>
           <div className="w-24 h-1 bg-milan-whatsapp mx-auto"></div>

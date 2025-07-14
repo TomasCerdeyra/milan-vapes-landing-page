@@ -15,7 +15,7 @@ const FAQ = () => {
     <section className="min-h-screen py-20 px-4 bg-gradient-to-b from-black/70 to-black/90 mushroom-pattern">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16 animate-on-scroll">
-          <h2 className="text-5xl md:text-6xl font-tan-nimbus text-milan-lightGray mb-6">
+          <h2 className="text-5xl md:text-6xl tracking-wider font-perandory text-milan-lightGray mb-6">
             PREGUNTAS FRECUENTES
           </h2>
           <div className="w-24 h-1 bg-milan-whatsapp mx-auto"></div>
